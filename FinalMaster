@@ -1,0 +1,235 @@
+#include <FastLED.h>
+
+#include <Keyboard.h>
+#include <KeyboardLayout.h>
+#include <Keyboard_da_DK.h>
+#include <Keyboard_de_DE.h>
+#include <Keyboard_es_ES.h>
+#include <Keyboard_fr_FR.h>
+#include <Keyboard_hu_HU.h>
+#include <Keyboard_it_IT.h>
+#include <Keyboard_pt_PT.h>
+#include <Keyboard_sv_SE.h>
+
+#include <SPI.h>
+
+//PING STUFF
+const int trigPinA = 2;
+const int echoPinA = 3;
+const int trigPinB = 4;
+const int echoPinB = 5;
+const int trigPinC = 6;
+const int echoPinC = 7;
+const int trigPinD = 8;
+const int echoPinD = 9;
+
+
+// defines variables for ping sensors
+long durationA;
+int distanceA;
+long durationB;
+int distanceB;
+long durationC;
+int distanceC;
+long durationD;
+int distanceD;
+
+// Joolz's Variables for ping sensors
+bool BlockedA = false;
+bool BlockedB = false;
+bool BlockedC = false;
+bool BlockedD = false;
+
+int detectionRange = 40;
+
+
+//led stuff
+#define NUM_LEDS 200
+#define DATA_PIN 10
+#define CLOCK_PIN 13
+CRGB leds[NUM_LEDS];
+
+
+void setup() {
+  // put your setup code here, to run once:
+    // Ping Sensor Setup
+  pinMode(trigPinA, OUTPUT);  // Sets the trigPin as an Output
+  pinMode(echoPinA, INPUT);   // Sets the echoPin as an Input
+  Serial.begin(9600);         // Starts the serial communication
+
+  pinMode(trigPinB, OUTPUT);  // Sets the trigPin as an Output
+  pinMode(echoPinB, INPUT);   // Sets the echoPin as an Input
+  Serial.begin(9600);         // Starts the serial communication
+
+  pinMode(trigPinC, OUTPUT);  // Sets the trigPin as an Output
+  pinMode(echoPinC, INPUT);   // Sets the echoPin as an Input
+  Serial.begin(9600);         // Starts the serial communication
+
+  pinMode(trigPinD, OUTPUT);  // Sets the trigPin as an Output
+  pinMode(echoPinD, INPUT);   // Sets the echoPin as an Input
+  Serial.begin(9600);         // Starts the serial communication
+
+  Keyboard.begin();     // begin monitoring the keyboard
+
+  FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);  // GRB ordering is assumed
+
+
+}
+
+//Function makes all necessary calculations to set ExtPos variable based on which ping sensors are blocked
+//Function also sets isPersonThere bool
+void sensorCheck() {
+  // Clears the trigPin
+  digitalWrite(trigPinA, LOW);
+  delayMicroseconds(2);
+  // Sets the trigPin on HIGH state for 10 micro seconds
+  digitalWrite(trigPinA, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPinA, LOW);
+  // Reads the echoPin, returns the sound wave travel time in microseconds
+  durationA = pulseIn(echoPinA, HIGH);
+  // Calculating the distance
+  distanceA = durationA * 0.034 / 2;
+  // Prints the distance on the Serial Monitor
+  //Serial.print("DistanceA: ");
+  //Serial.println(distanceA);
+
+  // Clears the trigPin
+  digitalWrite(trigPinB, LOW);
+  delayMicroseconds(2);
+  // Sets the trigPin on HIGH state for 10 micro seconds
+  digitalWrite(trigPinB, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPinB, LOW);
+  // Reads the echoPin, returns the sound wave travel time in microseconds
+  durationB = pulseIn(echoPinB, HIGH);
+  // Calculating the distance
+  distanceB = durationB * 0.034 / 2;
+  // Prints the distance on the Serial Monitor
+  //Serial.print("DistanceB: ");
+  //Serial.println(distanceB);
+
+  // Clears the trigPin
+  digitalWrite(trigPinC, LOW);
+  delayMicroseconds(2);
+  // Sets the trigPin on HIGH state for 10 micro seconds
+  digitalWrite(trigPinC, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPinC, LOW);
+  // Reads the echoPin, returns the sound wave travel time in microseconds
+  durationC = pulseIn(echoPinC, HIGH);
+  // Calculating the distance
+  distanceC = durationC * 0.034 / 2;
+  // Prints the distance on the Serial Monitor
+  //Serial.print("DistanceC: ");
+  //Serial.println(distanceC);
+
+ // Clears the trigPin
+  digitalWrite(trigPinD, LOW);
+  delayMicroseconds(2);
+  // Sets the trigPin on HIGH state for 10 micro seconds
+  digitalWrite(trigPinD, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPinD, LOW);
+  // Reads the echoPin, returns the sound wave travel time in microseconds
+  durationD = pulseIn(echoPinD, HIGH);
+  // Calculating the distance
+  distanceD = durationD * 0.034 / 2;
+  // Prints the distance on the Serial Monitor
+  //Serial.print("DistanceD: ");
+  //Serial.println(distanceD);
+
+  //Joolz's code
+  //Sets bools for each sensor based on detection range
+  BlockedA = distanceA < detectionRange;
+  BlockedB = distanceB < detectionRange;
+  BlockedC = distanceC < detectionRange;
+  BlockedD = distanceD < detectionRange;
+  // the above code means that BlockedX is true or false, based on whether distanceX is smaller than detection range
+}
+
+
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  sensorCheck ();
+  Serial.println(BlockedA);
+  Serial.println(BlockedB);
+  Serial.println(BlockedC);
+  Serial.println(BlockedD);
+
+  if (BlockedA) {
+    Keyboard.write (49);
+  for (int i = 1; i < 22; i++)
+   {
+  leds[i] =  CRGB(255, 255, 255);
+    
+  FastLED.show();
+  }
+
+  }
+  else{
+    for (int i = 1; i < 22; i++)
+   {
+    leds[i] =  CRGB(0, 0, 0);  }
+     FastLED.show();
+  }
+
+
+  if (BlockedB) {
+    Keyboard.write (50);
+  for (int j = 35; j < 55; j++)
+   {
+  leds[j] =  CRGB(255, 255, 255);
+    
+  FastLED.show();
+  }
+
+  }
+
+  else{
+    for (int j = 35; j < 55; j++)
+   {
+    leds[j] =  CRGB(0, 0, 0);  }
+     FastLED.show();
+  }
+
+
+  if (BlockedC) {
+    Keyboard.write (51);
+ for (int k = 70; k < 90; k++)
+   {
+  leds[k] =  CRGB(255, 255, 255);
+    
+  FastLED.show();
+  }
+
+  }
+
+ else{
+    for (int k = 70; k < 90; k++)
+   {
+    leds[k] =  CRGB(0, 0, 0);  }
+     FastLED.show();
+  }
+
+
+
+
+  if (BlockedD) {
+    Keyboard.write (52);
+for (int l = 96; l < 116; l++)
+   {
+  leds[l] =  CRGB(255, 255, 255);
+    
+  FastLED.show();
+  }
+
+  }
+
+  else{
+    for (int l = 96; l < 156; l++)
+   {
+    leds[l] =  CRGB(0, 0, 0);  }
+     FastLED.show();
+  }
